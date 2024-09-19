@@ -2,7 +2,16 @@ const express = require('express');
 
 const app = express();
 const path = require('node:path');
+const cors = require('cors');
+
 require('dotenv').config();
+
+app.use(cors({
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
