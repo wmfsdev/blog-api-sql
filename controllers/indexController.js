@@ -27,31 +27,39 @@ exports.form_signup_post = [
     .isLength({ min: 5 })
     .withMessage('Username must be specified'),
   body('password')
-    .trim()
-    .isLength({ min: 6 }),
+    .isLength({ min: 2 }),
+  body('confirm')
+    .custom((value, { req }) => value === req.body.password)
+    .withMessage('Passwords must match'),
 
   asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
     if (errors.isEmpty()) {
-      const { username } = req;
-      const { password } = req;
+      const { username } = req.body;
+      const { password } = req.body;
 
       const hashpwd = await bcrypt.hash(password, 10);
 
-      await prisma.user.create({
-        data: {
-          username,
-          hashpwd,
-        },
-      });
-
-      // check for pre-existing user
-
-      res.send('created user with password');
-      res.status(200).json();
+      try {
+        const user = await prisma.user.create({
+          data: {
+            username,
+            hashpwd,
+          },
+        });
+        const payloadObj = {
+          id: user.id,
+          username: user.username,
+        };
+        const token = jwt.sign(payloadObj, 'secret', { algorithm: 'HS256' });
+        res.status(200).json({ token });
+      } catch (err) {
+        console.log('catch err', err);
+      }
     } else {
-      console.log(errors);
+      // validation error handling
+      console.log('errorsds', errors);
     }
   }),
 ];
@@ -69,11 +77,14 @@ exports.form_login_post = (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
       console.log('user', user);
       if (err) { return next(err); }
-      if (!user) { return res.redirect('/fail'); }
+      if (!user) {
+        console.log('no user');
+        return res.status(401).json(info);
+      }
       if (user) {
         const payloadObj = {
           id: user.id,
-          name: user.username,
+          username: user.username,
         };
         const token = jwt.sign(payloadObj, 'secret', { algorithm: 'HS256' });
         return res.json({ token });
@@ -82,6 +93,7 @@ exports.form_login_post = (req, res, next) => {
   } catch (error) {
     console.log('catch node err');
     const status = error.statusCode;
-    res.status(status).json({ error: error.data });
+    // sends array of errors to client
+    res.status(status).json(error.data);
   }
 };
