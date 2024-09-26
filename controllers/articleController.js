@@ -2,13 +2,27 @@ const asyncHandler = require('express-async-handler');
 const passport = require('passport');
 const prisma = require('../prisma/client');
 
+// GET all articles
 exports.article_get = asyncHandler(async (req, res, next) => {
-  // get all articles
-  const articles = await prisma.article.findMany();
+  const articles = await prisma.article.findMany({
+    include: {
+      comments: {
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+            },
+          },
+        },
+      },
+    },
+  });
   console.log(articles);
   return res.json(articles);
 });
 
+// POST Article
 exports.article_post = asyncHandler(async (req, res, next) => {
   await prisma.article.create({
     data: {
