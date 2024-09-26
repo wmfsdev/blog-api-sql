@@ -6,20 +6,6 @@ const { body, validationResult } = require('express-validator');
 
 const prisma = require('../prisma/client');
 
-//  localhost:000/user
-exports.form_signup_get = asyncHandler(async (req, res, next) => {
-  const hashedPassword = await bcrypt.hash('password', 10);
-
-  await prisma.user.create({
-    data: {
-      username: 'first',
-      hashpwd: hashedPassword,
-    },
-  });
-
-  res.send('created user with password');
-});
-
 exports.form_signup_post = [
 
   body('username')
@@ -79,7 +65,8 @@ exports.form_login_post = (req, res, next) => {
       if (err) { return next(err); }
       if (!user) {
         console.log('no user');
-        return res.status(401).json(info);
+        console.log(info);
+        return res.status(401).json([info]);
       }
       if (user) {
         const payloadObj = {
@@ -91,9 +78,10 @@ exports.form_login_post = (req, res, next) => {
       }
     })(req, res, next);
   } catch (error) {
+    // sends array of errors to client
     console.log('catch node err');
     const status = error.statusCode;
-    // sends array of errors to client
+    console.log(error.data);
     res.status(status).json(error.data);
   }
 };
