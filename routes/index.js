@@ -28,7 +28,7 @@ router.get('/articles', articleController.article_get);
 // PROTECTED ROUTES
 
 // GET all comments for specific article
-router.get('/articles/:id/comments', articleController.user_comment_post);
+router.post('/articles/:id/comments', articleController.user_comment_post);
 
 // POST Article
 router.get('/test', articleController.article_post);
