@@ -23,11 +23,17 @@ router.post('/login-form', [
 ], indexController.form_login_post);
 
 // GET all Articles
-router.get('/articles', articleController.article_get);
+router.get('/articles', articleController.articles_get);
+
+// GET Article
+router.get('/articles/:id', articleController.article_get);
+
+// GET all comments for specific article
+router.get('/articles/:id/comments', articleController.article_comments_get);
 
 // PROTECTED ROUTES
 
-// GET all comments for specific article
+// POST
 router.post('/articles/:id/comments', articleController.user_comment_post);
 
 // POST Article
