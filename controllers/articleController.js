@@ -2,23 +2,42 @@ const asyncHandler = require('express-async-handler');
 const passport = require('passport');
 const prisma = require('../prisma/client');
 
-// GET all articles
+// GET article by ID
 exports.article_get = asyncHandler(async (req, res, next) => {
-  const articles = await prisma.article.findMany({
+  console.log('req.params', req.params);
+  // these are jsut comments
+  // but we need the article as well!
+  const article = await prisma.article.findUnique({
+    where: {
+      id: Number(req.params.id),
+    },
+  });
+  //  console.log(article);
+  return res.json(article);
+});
+
+// GET all comments for article
+exports.article_comments_get = asyncHandler(async (req, res, next) => {
+  console.log('all comments param id', req.params.id);
+  const comments = await prisma.comment.findMany({
+    where: {
+      articleId: Number(req.params.id),
+    },
     include: {
-      comments: {
-        include: {
-          author: {
-            select: {
-              id: true,
-              username: true,
-            },
-          },
+      author: {
+        select: {
+          username: true,
         },
       },
     },
   });
-  console.log(articles);
+  console.log(comments);
+  return res.json(comments);
+});
+
+// GET all articles
+exports.articles_get = asyncHandler(async (req, res, next) => {
+  const articles = await prisma.article.findMany({});
   return res.json(articles);
 });
 
@@ -39,38 +58,24 @@ exports.user_comment_post = asyncHandler(async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: 'not authorised' });
     }
-
-    console.log('auth user ', user);
+    // check against user details that user has permission to post as said user
+    // should be fine: user can only contain the ID of a non-malformed token i.e.
+    // the one you should be authenticating with. can't change the ID before, it
+    // will fail auth.
 
     const userId = user.id;
     const articleId = Number(req.params.id);
 
-    // await prisma.comment.create({
-    //   data: {
-    //     body: 'new sql comment',
-    //     authorId: userId,
-    //     articleId,
-    //   },
-    // });
+    const { comment } = req.body;
 
-    // for testing ^^creation
-    const users = await prisma.user.findMany({
-      where: {
-        role: 'USER',
-      },
-      include: {
-        comments: true,
+    await prisma.comment.create({
+      data: {
+        body: comment,
+        authorId: userId,
+        articleId,
       },
     });
-    console.log('user include comments', users[0].comments);
 
     return res.status(200).json(info);
   })(req, res, next);
-
-  // extract payload from token for user ID
-
-  // article ID
-  // const articleId = req.params.id;
-
-  // console.log(articleId);
 });
