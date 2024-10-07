@@ -79,3 +79,24 @@ exports.user_comment_post = asyncHandler(async (req, res, next) => {
     return res.status(200).json(info);
   })(req, res, next);
 });
+
+exports.user_comment_delete = asyncHandler(async (req, res, next) => {
+  console.log('user comment delete');
+
+  passport.authenticate('jwt', async (err, user, info) => {
+    if (!user) {
+      return res.status(401).json({ message: 'not authorised' });
+    }
+
+    const commentId = Number(req.body.comment);
+    // const articleId = req.body.article;
+
+    await prisma.comment.delete({
+      where: {
+        id: commentId,
+      },
+    });
+
+    return res.status(200).json(info);
+  })(req, res, next);
+});
