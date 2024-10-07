@@ -33,10 +33,13 @@ router.get('/articles/:id/comments', articleController.article_comments_get);
 
 // PROTECTED ROUTES
 
-// POST
+// POST User comment
 router.post('/articles/:id/comments', articleController.user_comment_post);
 
 // POST Article
 router.get('/test', articleController.article_post);
+
+// DELETE User comment
+router.delete('/articles/:id/comments/:id', articleController.user_comment_delete);
 
 module.exports = router;
