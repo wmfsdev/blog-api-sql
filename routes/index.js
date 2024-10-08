@@ -34,7 +34,11 @@ router.get('/articles/:id/comments', articleController.article_comments_get);
 // PROTECTED ROUTES
 
 // POST User comment
-router.post('/articles/:id/comments', articleController.user_comment_post);
+router.post('/articles/:id/comments', [
+  body('comment')
+    .isLength({ min: 5 })
+    .withMessage('Please enter a comment'),
+], articleController.user_comment_post);
 
 // POST Article
 router.get('/test', articleController.article_post);
