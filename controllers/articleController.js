@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
 const passport = require('passport');
 const prisma = require('../prisma/client');
 
@@ -53,32 +54,46 @@ exports.article_post = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.user_comment_post = asyncHandler(async (req, res, next) => {
-  passport.authenticate('jwt', async (err, user, info) => {
-    if (!user) {
-      return res.status(401).json({ message: 'not authorised' });
+exports.user_comment_post = (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      console.log('validation errors');
+      const err = new Error('validation failed');
+      err.statusCode = 422;
+      err.data = errors.array();
+      throw err;
     }
-    // check against user details that user has permission to post as said user
-    // should be fine: user can only contain the ID of a non-malformed token i.e.
-    // the one you should be authenticating with. can't change the ID before, it
-    // will fail auth.
+    passport.authenticate('jwt', async (err, user, info) => {
+      if (!user) {
+        return res.status(401).json({ message: 'not authorised' });
+      }
+      // check against user details that user has permission to post as said user
+      // should be fine: user can only contain the ID of a non-malformed token i.e.
+      // the one you should be authenticating with. can't change the ID before, it
+      // will fail auth.
+      const userId = user.id;
+      const articleId = Number(req.params.id);
+      const { comment } = req.body;
 
-    const userId = user.id;
-    const articleId = Number(req.params.id);
-
-    const { comment } = req.body;
-
-    await prisma.comment.create({
-      data: {
-        body: comment,
-        authorId: userId,
-        articleId,
-      },
-    });
-
-    return res.status(200).json(info);
-  })(req, res, next);
-});
+      await prisma.comment.create({
+        data: {
+          body: comment,
+          authorId: userId,
+          articleId,
+        },
+      });
+      return res.status(200).json(info);
+    })(req, res, next);
+  } catch (error) {
+    // err throw - sends array of errors to client
+    console.log('catch node err');
+    const status = error.statusCode;
+    console.log(error.data);
+    res.status(status).json(error.data);
+  }
+};
 
 exports.user_comment_delete = asyncHandler(async (req, res, next) => {
   console.log('user comment delete');
@@ -87,15 +102,30 @@ exports.user_comment_delete = asyncHandler(async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: 'not authorised' });
     }
-
+    // include user id as hidden input to compare - frontend solution
+    const userId = Number(user.id); // from token
+    // check that User has permission to delete the specific comment!
+    // look at payload of the token and compare User IDs
     const commentId = Number(req.body.comment);
-    // const articleId = req.body.article;
 
-    await prisma.comment.delete({
+    const deletionResult = await prisma.comment.deleteMany({
       where: {
-        id: commentId,
+        AND: [
+          {
+            id: {
+              equals: commentId,
+            },
+          },
+          {
+            authorId: {
+              equals: userId,
+            },
+          },
+        ],
       },
     });
+
+    console.log('deletionResult', deletionResult);
 
     return res.status(200).json(info);
   })(req, res, next);
