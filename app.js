@@ -21,7 +21,7 @@ const indexRouter = require('./routes/index');
 const articleRouter = require('./routes/articles');
 
 app.use('/', indexRouter);
-app.use('/articles', articleRouter);
+// app.use('/articles', articleRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);
