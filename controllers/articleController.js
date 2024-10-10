@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const { body, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 const passport = require('passport');
 const prisma = require('../prisma/client');
 
@@ -44,14 +44,14 @@ exports.articles_get = asyncHandler(async (req, res, next) => {
 
 // POST Article
 exports.article_post = asyncHandler(async (req, res, next) => {
-  await prisma.article.create({
-    data: {
-      title: 'second post',
-      body: 'body of the second post',
-      category: 'social',
-      authorId: 1,
-    },
-  });
+  // await prisma.article.create({
+  //   data: {
+  //     title: 'second post',
+  //     body: 'body of the second post',
+  //     category: 'social',
+  //     authorId: 1,
+  //   },
+  // });
 });
 
 exports.user_comment_post = (req, res, next) => {
@@ -125,8 +125,10 @@ exports.user_comment_delete = asyncHandler(async (req, res, next) => {
       },
     });
 
-    console.log('deletionResult', deletionResult);
-
+    if (deletionResult.count === 0) {
+      console.log('deletionResult', deletionResult);
+      return res.status(400).json(info);
+    }
     return res.status(200).json(info);
   })(req, res, next);
 });
