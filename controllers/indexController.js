@@ -11,7 +11,7 @@ exports.form_signup_post = [
   body('username')
     .trim()
     .isLength({ min: 5 })
-    .withMessage('Username must be specified'),
+    .withMessage('Username must be 5 or more characters long'),
   body('password')
     .isLength({ min: 2 }),
   body('confirm')
@@ -41,10 +41,22 @@ exports.form_signup_post = [
         const token = jwt.sign(payloadObj, 'secret', { algorithm: 'HS256' });
         res.status(200).json({ token });
       } catch (err) {
+        // Prisma error i.e. unique constraint on username
         console.log('catch err', err);
+        if (err.code === 'P2002') {
+          return res.status(422).json([{ msg: 'Username already taken' }]);
+        }
+        // const err{
+        //   "error": "Bad request",
+        //   "message": "Request body could not be read properly.",
+        // }
       }
     } else {
       // validation error handling
+      const err = new Error('validation failed');
+      err.statusCode = 422;
+      err.data = errors.array();
+      res.status(err.statusCode).json(err.data);
       console.log('errorsds', errors);
     }
   }),
