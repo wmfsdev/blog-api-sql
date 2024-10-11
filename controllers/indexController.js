@@ -38,7 +38,7 @@ exports.form_signup_post = [
           id: user.id,
           username: user.username,
         };
-        const token = jwt.sign(payloadObj, 'secret', { algorithm: 'HS256' });
+        const token = jwt.sign(payloadObj, process.env.SECRET, { algorithm: 'HS256' });
         res.status(200).json({ token });
       } catch (err) {
         // Prisma error i.e. unique constraint on username
@@ -85,7 +85,7 @@ exports.form_login_post = (req, res, next) => {
           id: user.id,
           username: user.username,
         };
-        const token = jwt.sign(payloadObj, 'secret', { algorithm: 'HS256' });
+        const token = jwt.sign(payloadObj, process.env.SECRET, { algorithm: 'HS256' });
         return res.json({ token });
       }
     })(req, res, next);

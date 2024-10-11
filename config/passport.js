@@ -33,7 +33,7 @@ passport.use(
 
 const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = 'secret';
+opts.secretOrKey = process.env.SECRET;
 
 passport.use(
   new JwtStrategy(opts, (jwt_payload, done) => {
