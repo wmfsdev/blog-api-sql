@@ -37,6 +37,7 @@ exports.form_signup_post = [
         const payloadObj = {
           id: user.id,
           username: user.username,
+          role: user.role,
         };
         const token = jwt.sign(payloadObj, process.env.SECRET, { algorithm: 'HS256' });
         res.status(200).json({ token });
@@ -80,10 +81,30 @@ exports.form_login_post = (req, res, next) => {
         console.log(info);
         return res.status(401).json([info]);
       }
+
+      // if login from CMS and user NOT admin return not authorised
+      if (req.hostname === process.env.CMS_URL && user.role === 'USER') {
+        console.log('403 USER');
+        return res.status(401).json([{ message: 'forbiddenn' }]);
+      }
+
+      // if login from CMS and user IS admin sign and return token
+      // if (req.hostname === process.env.CMS_URL && user.role === "ADMIN") {
+      //   const payloadObj = {
+      //     id: user.id,
+      //     username: user.username,
+      //     role: user.role
+      //   };
+      //   const token = jwt.sign(payloadObj, process.env.SECRET, { algorithm: 'HS256' });
+      //   return res.json({ token });
+      // }
+
+      // if login from ANYWHERE ELSE carry on as usual (user role not relevant)
       if (user) {
         const payloadObj = {
           id: user.id,
           username: user.username,
+          role: user.role,
         };
         const token = jwt.sign(payloadObj, process.env.SECRET, { algorithm: 'HS256' });
         return res.json({ token });
