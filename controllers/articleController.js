@@ -36,21 +36,9 @@ exports.article_comments_get = asyncHandler(async (req, res, next) => {
   return res.json(comments);
 });
 
-// GET all articles
 exports.articles_get = asyncHandler(async (req, res, next) => {
-  // if coming from CMS authenticate first - success:
-  // retrieve all articles otherwise retrieve only those set to publish: true
-  // console.log(req.hostname)
-  if (req.hostname === process.env.CMS_URL) { // CMS check
-    passport.authenticate('jwt', async (err, user, info) => {
-      if (!user) {
-        return res.status(401).json({ message: 'not authorised' });
-      }
-      const articles = await prisma.article.findMany({});
-      return res.json(articles);
-      // return res.status(200).json();
-    })(req, res, next);
-  } else {
+  // NOT from CMS - any origin
+  if (req.hostname !== process.env.CMS_URL) {
     const articles = await prisma.article.findMany({
       orderBy: {
         id: 'asc',
@@ -60,8 +48,44 @@ exports.articles_get = asyncHandler(async (req, res, next) => {
       },
     });
     return res.json(articles);
-  }
+  } // ELSE can only be CMS
+  passport.authenticate('jwt', async (err, user, info) => {
+    if (!user) {
+      return res.status(401).json({ message: 'not authorised' });
+    }
+    const articles = await prisma.article.findMany({});
+    return res.json(articles);
+    // return res.status(200).json();
+  })(req, res, next);
 });
+
+// GET all articles
+// exports.articles_get = asyncHandler(async (req, res, next) => {
+//   // if coming from CMS authenticate first - success:
+//   // retrieve all articles otherwise retrieve only those set to publish: true
+//   // console.log(req.hostname)
+//   if (req.hostname === process.env.CMS_URL) { // CMS check
+//     passport.authenticate('jwt', async (err, user, info) => {
+//       if (!user) {
+//         return res.status(401).json({ message: 'not authorised' });
+//       }
+//       const articles = await prisma.article.findMany({});
+//       return res.json(articles);
+//       // return res.status(200).json();
+//     })(req, res, next);
+//   } else {
+//     // FOR THE BLOG
+//     const articles = await prisma.article.findMany({
+//       orderBy: {
+//         id: 'asc',
+//       },
+//       where: {
+//         publish: true,
+//       },
+//     });
+//     return res.json(articles);
+//   }
+// });
 
 // POST Article
 exports.article_post = asyncHandler(async (req, res, next) => {
