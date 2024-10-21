@@ -41,26 +41,26 @@ exports.articles_get = asyncHandler(async (req, res, next) => {
   // if coming from CMS authenticate first - success:
   // retrieve all articles otherwise retrieve only those set to publish: true
   // console.log(req.hostname)
-  // if (req.hostname === process.env.CMS_URL) { // CMS check
-  //   passport.authenticate('jwt', async (err, user, info) => {
-  //     if (!user) {
-  //       return res.status(401).json({ message: 'not authorised' });
-  //     }
-  //     const articles = await prisma.article.findMany({});
-  //     return res.json(articles);
-  //     // return res.status(200).json();
-  //   })(req, res, next);
-  // } else {
-  const articles = await prisma.article.findMany({
-    orderBy: {
-      id: 'asc',
-    },
-    where: {
-      publish: true,
-    },
-  });
-  return res.json(articles);
-  // }
+  if (req.hostname === process.env.CMS_URL) { // CMS check
+    passport.authenticate('jwt', async (err, user, info) => {
+      if (!user) {
+        return res.status(401).json({ message: 'not authorised' });
+      }
+      const articles = await prisma.article.findMany({});
+      return res.json(articles);
+      // return res.status(200).json();
+    })(req, res, next);
+  } else {
+    const articles = await prisma.article.findMany({
+      orderBy: {
+        id: 'asc',
+      },
+      where: {
+        publish: true,
+      },
+    });
+    return res.json(articles);
+  }
 });
 
 // POST Article
