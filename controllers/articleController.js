@@ -38,6 +38,7 @@ exports.article_comments_get = asyncHandler(async (req, res, next) => {
 
 exports.articles_get = asyncHandler(async (req, res, next) => {
   // NOT from CMS - any origin
+  console.log('hostname', req.hostname);
   if (req.hostname !== process.env.CMS_URL) {
     const articles = await prisma.article.findMany({
       orderBy: {
