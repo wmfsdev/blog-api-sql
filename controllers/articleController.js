@@ -40,6 +40,7 @@ exports.articles_get = asyncHandler(async (req, res, next) => {
   // NOT from CMS - any origin
   console.log('header origin', req.headers.origin);
   if (req.headers.origin !== process.env.CMS_URL) {
+    console.log('not CMS');
     const articles = await prisma.article.findMany({
       orderBy: {
         id: 'asc',
@@ -50,6 +51,7 @@ exports.articles_get = asyncHandler(async (req, res, next) => {
     });
     return res.json(articles);
   } // ELSE can only be CMS
+  console.log('pre auth post header check');
   passport.authenticate('jwt', async (err, user, info) => {
     if (!user) {
       return res.status(401).json({ message: 'not authorised' });
