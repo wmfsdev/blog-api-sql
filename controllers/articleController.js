@@ -53,10 +53,13 @@ exports.articles_get = asyncHandler(async (req, res, next) => {
   } // ELSE can only be CMS
   console.log('pre auth post header check');
   passport.authenticate('jwt', async (err, user, info) => {
+    console.log('auth start');
     if (!user) {
+      console.log('no user');
       return res.status(401).json({ message: 'not authorised' });
     }
     const articles = await prisma.article.findMany({});
+    console.log('articles: ');
     return res.json(articles);
     // return res.status(200).json();
   })(req, res, next);
