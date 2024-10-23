@@ -83,7 +83,7 @@ exports.form_login_post = (req, res, next) => {
       }
 
       // if login from CMS and user NOT admin return not authorised
-      if (req.hostname === process.env.CMS_URL && user.role === 'USER') {
+      if (req.headers.origin === process.env.CMS_URL && user.role === 'USER') {
         console.log('403 USER');
         return res.status(401).json([{ message: 'forbiddenn' }]);
       }
