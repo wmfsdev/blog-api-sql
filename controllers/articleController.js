@@ -65,6 +65,16 @@ exports.articles_get = asyncHandler(async (req, res, next) => {
   })(req, res, next);
 });
 
+exports.article_delete = asyncHandler(async (req, res, next) => {
+  console.log('req.params', req.params.id);
+  const article = await prisma.article.delete({
+    where: {
+      id: Number(req.params.id),
+    },
+  });
+  return res.status(200).json(article);
+});
+
 // GET all articles
 // exports.articles_get = asyncHandler(async (req, res, next) => {
 //   // if coming from CMS authenticate first - success:
