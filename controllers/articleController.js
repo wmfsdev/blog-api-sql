@@ -6,14 +6,24 @@ const prisma = require('../prisma/client');
 // GET article by ID
 exports.article_get = asyncHandler(async (req, res, next) => {
   console.log('req.params', req.params);
-  // these are jsut comments
-  // but we need the article as well!
-  const article = await prisma.article.findUnique({
+  // these are just comments but we need the article as well!
+  const article = await prisma.article.findMany({
     where: {
-      id: Number(req.params.id),
+      AND: [
+        {
+          id: {
+            equals: Number(req.params.id),
+          },
+        },
+        {
+          publish: {
+            equals: true,
+          },
+        },
+      ],
     },
   });
-  //  console.log(article);
+  console.log('yes you know', article);
   return res.json(article);
 });
 
@@ -32,7 +42,7 @@ exports.article_comments_get = asyncHandler(async (req, res, next) => {
       },
     },
   });
-  console.log(comments);
+  // console.log(comments);
   return res.json(comments);
 });
 
@@ -66,13 +76,13 @@ exports.articles_get = asyncHandler(async (req, res, next) => {
 });
 
 exports.article_delete = asyncHandler(async (req, res, next) => {
-  console.log('req.params', req.params.id);
-  const article = await prisma.article.delete({
-    where: {
-      id: Number(req.params.id),
-    },
-  });
-  return res.status(200).json(article);
+  console.log(req.params.id);
+  // const article = await prisma.article.delete({
+  //   where: {
+  //     id: Number(req.params.id),
+  //   },
+  // });
+  // return res.status(200).json(article);
 });
 
 // GET all articles
