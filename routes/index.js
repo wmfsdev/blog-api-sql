@@ -43,9 +43,12 @@ router.post('/articles/:id/comments', [
 ], articleController.user_comment_post);
 
 // POST Article
-router.get('/test', articleController.article_post);
+router.post('/articles', articleController.article_post);
 
 // DELETE User comment
 router.delete('/articles/:id/comments/:id', articleController.user_comment_delete);
+
+// UPDATE Article
+router.put('/articles/:id', articleController.article_update);
 
 module.exports = router;
