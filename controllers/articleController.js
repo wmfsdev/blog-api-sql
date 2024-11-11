@@ -73,40 +73,55 @@ exports.articles_get = asyncHandler(async (req, res, next) => {
 });
 
 exports.article_delete = asyncHandler(async (req, res, next) => {
-  const article = await prisma.article.delete({
-    where: {
-      id: Number(req.params.id),
-    },
-  });
-  return res.status(200).json(article);
+  passport.authenticate('jwt', async (err, user, info) => {
+    if (!user) {
+      return res.status(401).json({ message: 'not authorised' });
+    }
+    const article = await prisma.article.delete({
+      where: {
+        id: Number(req.params.id),
+      },
+    });
+    return res.status(200).json(article);
+  })(req, res, next);
 });
 
 // PUT Article
 exports.article_update = asyncHandler(async (req, res, next) => {
-  const update = await prisma.article.update({
-    where: {
-      id: Number(req.params.id),
-    },
-    data: {
-      title: req.body.title || undefined,
-      body: req.body.body || undefined,
-      publish: req.body.publish, // || undefined, // !(/true/).test(req.body.publish)
-    },
-  });
-  return res.status(200).json(update);
+  passport.authenticate('jwt', async (err, user, info) => {
+    if (!user) {
+      return res.status(401).json({ message: 'not authorised' });
+    }
+    const update = await prisma.article.update({
+      where: {
+        id: Number(req.params.id),
+      },
+      data: {
+        title: req.body.title || undefined,
+        body: req.body.body || undefined,
+        publish: req.body.publish,
+      },
+    });
+    return res.status(200).json(update);
+  })(req, res, next);
 });
 
 // POST Article
 exports.article_post = asyncHandler(async (req, res, next) => {
-  const { title, body } = req.body;
-  await prisma.article.create({
-    data: {
-      title,
-      body,
-      category: 'social',
-      authorId: 1,
-    },
-  });
+  passport.authenticate('jwt', async (err, user, info) => {
+    if (!user) {
+      return res.status(401).json({ message: 'not authorised' });
+    }
+    const { title, body } = req.body;
+    await prisma.article.create({
+      data: {
+        title,
+        body,
+        category: 'social',
+        authorId: 1,
+      },
+    });
+  })(req, res, next);
 });
 
 exports.user_comment_post = (req, res, next) => {
@@ -182,7 +197,7 @@ exports.user_comment_delete = asyncHandler(async (req, res, next) => {
 
     if (deletionResult.count === 0) {
       console.log('deletionResult', deletionResult);
-      return res.status(400).json(info);
+      return res.status(400).json();
     }
     return res.status(200).json(info);
   })(req, res, next);
