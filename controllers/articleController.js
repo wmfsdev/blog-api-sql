@@ -6,24 +6,37 @@ require('dotenv').config();
 
 // GET article by ID
 exports.article_get = asyncHandler(async (req, res, next) => {
-  const article = await prisma.article.findMany({
-    where: {
-      AND: [
-        {
-          id: {
-            equals: Number(req.params.id),
+  // NOT FROM CMS
+  if (req.headers.origin !== process.env.CMS_URL) {
+    const article = await prisma.article.findMany({
+      where: {
+        AND: [
+          {
+            id: {
+              equals: Number(req.params.id),
+            },
           },
-        },
-        {
-          publish: {
-            equals: true,
+          {
+            publish: {
+              equals: true,
+            },
           },
-        },
-      ],
-    },
-  });
-  console.log('yes you know', article);
-  return res.json(article);
+        ],
+      },
+    });
+    return res.json(article);
+  }
+  passport.authenticate('jwt', async (err, user, info) => {
+    if (!user) {
+      return res.status(401).json({ message: 'not authorised' });
+    }
+    const articles = await prisma.article.findMany({
+      orderBy: {
+        id: 'asc',
+      },
+    });
+    return res.json(articles);
+  })(req, res, next);
 });
 
 // GET all comments for article
@@ -82,6 +95,7 @@ exports.article_delete = asyncHandler(async (req, res, next) => {
         id: Number(req.params.id),
       },
     });
+    console.log('delete', article);
     return res.status(200).json(article);
   })(req, res, next);
 });
@@ -102,6 +116,7 @@ exports.article_update = asyncHandler(async (req, res, next) => {
         publish: req.body.publish,
       },
     });
+    console.log('pub status: ', update);
     return res.status(200).json(update);
   })(req, res, next);
 });
