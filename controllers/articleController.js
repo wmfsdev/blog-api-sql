@@ -31,8 +31,10 @@ exports.article_get = asyncHandler(async (req, res, next) => {
       return res.status(401).json({ message: 'not authorised' });
     }
     const articles = await prisma.article.findMany({
-      orderBy: {
-        id: 'asc',
+      where: {
+        id: {
+          equals: Number(req.params.id),
+        },
       },
     });
     return res.json(articles);
