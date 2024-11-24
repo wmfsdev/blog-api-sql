@@ -60,9 +60,7 @@ exports.article_comments_get = asyncHandler(async (req, res, next) => {
 
 exports.articles_get = asyncHandler(async (req, res, next) => {
   // NOT from CMS - any origin
-  console.log('header origin', req.headers.origin);
   if (req.headers.origin !== process.env.CMS_URL) {
-    console.log('not CMS');
     const articles = await prisma.article.findMany({
       orderBy: {
         id: 'asc',
@@ -130,14 +128,17 @@ exports.article_post = asyncHandler(async (req, res, next) => {
       return res.status(401).json({ message: 'not authorised' });
     }
     const { title, body } = req.body;
+    const { id } = user;
+
     await prisma.article.create({
       data: {
         title,
         body,
         category: 'social',
-        authorId: 1,
+        authorId: id,
       },
     });
+    return res.status(200).json();
   })(req, res, next);
 });
 
@@ -153,6 +154,7 @@ exports.user_comment_post = (req, res, next) => {
       throw err;
     }
     passport.authenticate('jwt', async (err, user, info) => {
+      console.log(user);
       if (!user) {
         return res.status(401).json({ message: 'not authorised' });
       }
