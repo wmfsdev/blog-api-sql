@@ -18,11 +18,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const indexRouter = require('./routes/index');
-const articleRouter = require('./routes/articles');
 
 app.use('/', indexRouter);
-// app.use('/articles', articleRouter);
-
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).send(err);
