@@ -38,19 +38,17 @@ router.delete('/articles/:id', articleController.article_delete);
 // POST User comment
 router.post('/articles/:id/comments', [
   body('comment')
-    .isLength({ min: 5 })
-    .withMessage('Please enter a comment'),
+    .isLength({ min: 1 })
+    .withMessage('Looks like you forgot to write your comment!'),
 ], articleController.user_comment_post);
-
 
 // POST Article
 router.post('/articles', articleController.article_post);
-
 
 // DELETE User comment
 router.delete('/articles/:id/comments/:id', articleController.user_comment_delete);
 
 // UPDATE Article
-router.put('/articles/:id', articleController.article_update)
+router.put('/articles/:id', articleController.article_update);
 
 module.exports = router;
