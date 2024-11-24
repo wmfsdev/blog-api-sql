@@ -31,9 +31,12 @@ passport.use(
   }),
 );
 
-const opts = {};
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = process.env.SECRET;
+const opts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.SECRET,
+  ignoreExpiration: false,
+  maxAge: '1800000',
+};
 
 passport.use(
   new JwtStrategy(opts, (jwt_payload, done) => {
