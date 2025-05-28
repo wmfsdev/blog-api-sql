@@ -48,6 +48,8 @@ router.post('/articles', articleController.article_post);
 // DELETE User comment
 router.delete('/articles/:id/comments/:id', articleController.user_comment_delete);
 
+// check to make sure that the controller only works for the correct USER, not any random user
+
 // UPDATE Article
 router.put('/articles/:id', articleController.article_update);
 
