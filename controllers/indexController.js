@@ -9,11 +9,16 @@ const prisma = require('../prisma/client');
 exports.form_signup_post = [
 
   body('username')
+    .notEmpty().withMessage('Username is required')
     .trim()
-    .isLength({ min: 5 })
-    .withMessage('Username must be 5 or more characters long'),
+    .isLength({ min: 5, max: 18 })
+    .withMessage('Username must be between 5 and 18 characters')
+    .isAlphanumeric()
+    .withMessage('May only contain alphanumeric characters'),
   body('password')
-    .isLength({ min: 2 }),
+    .trim()
+    .isLength({ min: 6, max: 25 })
+    .withMessage('Must be between 6 and 25 characters'),
   body('confirm')
     .custom((value, { req }) => value === req.body.password)
     .withMessage('Passwords must match'),

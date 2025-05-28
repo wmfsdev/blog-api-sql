@@ -14,12 +14,16 @@ router.post('/signup-form', indexController.form_signup_post);
 // POST Login Form
 router.post('/login-form', [
   body('username')
+    .notEmpty().withMessage('Username is required')
     .trim()
-    .isLength({ min: 5 })
-    .withMessage('Username too short'),
+    .isLength({ min: 5, max: 18 })
+    .withMessage('Username must be between 5 and 18 characters')
+    .isAlphanumeric()
+    .withMessage('May only contain alphanumeric characters'),
   body('password')
-    .trim(),
-  // .isLength({ min: 6 }),
+    .trim()
+    .isLength({ min: 6, max: 25 })
+    .withMessage('Must be between 6 and 25 characters'),
 ], indexController.form_login_post);
 
 // GET all Articles
@@ -38,8 +42,9 @@ router.delete('/articles/:id', articleController.article_delete);
 // POST User comment
 router.post('/articles/:id/comments', [
   body('comment')
-    .isLength({ min: 1 })
-    .withMessage('Looks like you forgot to write your comment!'),
+    .notEmpty().withMessage('Looks like you forgot to write your comment!')
+    .isLength({ min: 1, max: 500 })
+    .withMessage('Cannot exceed 500 characters'),
 ], articleController.user_comment_post);
 
 // POST Article
