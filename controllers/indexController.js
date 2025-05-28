@@ -39,26 +39,19 @@ exports.form_signup_post = [
           username: user.username,
           role: user.role,
         };
+
         const token = jwt.sign(payloadObj, process.env.SECRET, { algorithm: 'HS256', expiresIn: '1800000' });
         res.status(200).json({ token });
       } catch (err) {
-        // Prisma error i.e. unique constraint on username
-        console.log('catch err', err);
         if (err.code === 'P2002') {
           return res.status(422).json([{ msg: 'Username already taken' }]);
         }
-        // const err{
-        //   "error": "Bad request",
-        //   "message": "Request body could not be read properly.",
-        // }
       }
     } else {
-      // validation error handling
       const err = new Error('validation failed');
       err.statusCode = 422;
       err.data = errors.array();
       res.status(err.statusCode).json(err.data);
-      console.log('errorsds', errors);
     }
   }),
 ];
@@ -67,28 +60,21 @@ exports.form_login_post = (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('validation errors');
       const err = new Error('validation failed');
       err.statusCode = 422;
       err.data = errors.array();
       throw err;
     }
     passport.authenticate('local', (err, user, info) => {
-      console.log('user', user);
       if (err) { return next(err); }
       if (!user) {
-        console.log('no user');
-        console.log(info);
         return res.status(401).json([info]);
       }
 
-      // if login from CMS and user NOT admin return not authorised
       if (req.headers.origin === process.env.CMS_URL && user.role === 'USER') {
-        console.log('403 USER');
-        return res.status(401).json([{ message: 'forbiddenn' }]);
+        return res.status(401).json([{ message: 'forbidden' }]);
       }
 
-      // if login from ANYWHERE ELSE carry on as usual (user role not relevant)
       if (user) {
         const payloadObj = {
           id: user.id,
@@ -100,10 +86,7 @@ exports.form_login_post = (req, res, next) => {
       }
     })(req, res, next);
   } catch (error) {
-    // sends array of errors to client
-    console.log('catch node err');
     const status = error.statusCode;
-    console.log(error.data);
     res.status(status).json(error.data);
   }
 };
