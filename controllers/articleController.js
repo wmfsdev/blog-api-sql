@@ -73,7 +73,11 @@ exports.articles_get = asyncHandler(async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: 'not authorised' });
     }
-    const articles = await prisma.article.findMany({});
+    const articles = await prisma.article.findMany({
+      orderBy: {
+        timestamp: 'asc',
+      },
+    });
     return res.json(articles);
   })(req, res, next);
 });
@@ -119,13 +123,14 @@ exports.article_post = asyncHandler(async (req, res, next) => {
       return res.status(401).json({ message: 'not authorised' });
     }
 
-    const { title, body } = req.body;
+    const { title, body, thumbnail } = req.body;
     const { id } = user;
 
     await prisma.article.create({
       data: {
         title,
         body,
+        thumbnail,
         category: 'social',
         authorId: id,
       },
