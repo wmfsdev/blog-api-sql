@@ -24,8 +24,9 @@ model User {
 
 model Article {
   id        Int       @id @default(autoincrement())
-  title     String    @db.VarChar(50)
+  title     String    @db.VarChar(100)
   body      String    @db.Text
+  thumbnail String    @db.Text @default("")
   publish   Boolean   @default(false)
   category  String    @db.VarChar(30)
   timestamp DateTime  @default(now())
