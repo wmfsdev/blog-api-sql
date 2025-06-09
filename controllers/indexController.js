@@ -82,6 +82,7 @@ exports.form_login_post = (req, res, next) => {
       console.log('origin:', req.headers.origin);
       console.log('cms_url:', process.env.CMS_URL);
       console.log('user role:', user.role);
+      console.log('user typeof:', typeof user.role);
 
       if (user) {
         const payloadObj = {
