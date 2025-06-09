@@ -79,6 +79,8 @@ exports.form_login_post = (req, res, next) => {
       if (req.headers.origin === process.env.CMS_URL && user.role === 'USER') {
         return res.status(401).json([{ message: 'forbidden' }]);
       }
+      console.log('origin', req.headers.origin);
+      console.log('cms_url', process.env.CMS_URL);
 
       if (user) {
         const payloadObj = {
