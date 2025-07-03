@@ -1,8 +1,10 @@
-# BLOG API
+# BLOGGING PLATFORM
 
-LIVE: [https://wheres-wally-frontend-xi.vercel.app/](https://wheres-wally-frontend-xi.vercel.app/)<br>
-BACKEND REPO: [https://github.com/wmfsdev/wheres-wally-backend](https://github.com/wmfsdev/wheres-wally-backend)<br>
-FRONTEND REPO: [https://github.com/wmfsdev/wheres-wally-frontend](https://github.com/wmfsdev/wheres-wally-frontend)
+API: [https://blog-api-sql-production.up.railway.app](https://blog-api-sql-production.up.railway.app/)<br>
+CLIENT LIVE: [https://blog-frontend-client-production.up.railway.app](https://blog-frontend-client-production.up.railway.app/)<br>
+CLIENT REPO: [https://github.com/wmfsdev/blog-frontend-client](https://github.com/wmfsdev/blog-frontend-client)<br>
+CMS LIVE: [https://blog-frontend-cms-production.up.railway.app](https://blog-frontend-cms-production.up.railway.app/)<br>
+CMS REPO: [https://github.com/wmfsdev/blog-frontend-cms](https://github.com/wmfsdev/blog-frontend-cms)
 
 ## OUTLINE
 
